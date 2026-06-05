@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+// ─── REDUX HOOKS AUR ACTIONS IMPORT KIYE ──────────────────────────────────
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../../store/authSlice"; // Apne exact path ke mutabiq adjust karein
 import {
   LayoutDashboard,
   Users,
@@ -27,11 +29,16 @@ const navItems = [
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { user, logout } = useAuth();
+  
+  // ─── REDUX STATE MANAGEMENT ───────────────────────────────────────────────
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  
+  // auth slice se user data nikalna
+  const { user } = useSelector((state) => state.auth);
 
   const handleLogout = () => {
-    logout();
+    dispatch(logout()); // Redux reducer function call kiya
     navigate("/login");
   };
 
@@ -82,11 +89,11 @@ const AdminLayout = () => {
             <div className="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl bg-slate-800/50">
               <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-xs 
               font-bold shrink-0">
-                AD
+                {user?.name ? user.name.substring(0, 2).toUpperCase() : "AD"}
               </div>
               <div className="overflow-hidden">
-                <p className="text-xs font-semibold text-white truncate">{user?.name}</p>
-                <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+                <p className="text-xs font-semibold text-white truncate">{user?.name || "Admin User"}</p>
+                <p className="text-xs text-slate-400 truncate">{user?.email || "admin@example.com"}</p>
               </div>
             </div>
           )}
@@ -100,7 +107,7 @@ const AdminLayout = () => {
         </div>
       </aside>
 
-      {/* Main */}
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6">
           <button

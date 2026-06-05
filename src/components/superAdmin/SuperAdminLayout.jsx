@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+// ─── REDUX HOOKS AUR ACTIONS IMPORT KIYE ──────────────────────────────────
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../../store/authSlice"; // Apne exact path ke mutabiq check kar lein
 import {
   LayoutDashboard,
   School,
@@ -11,7 +13,6 @@ import {
   Menu,
   X,
   GraduationCap,
-  //   ChevronRight,
 } from "lucide-react";
 
 const navItems = [
@@ -24,11 +25,16 @@ const navItems = [
 
 const SuperAdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { user, logout } = useAuth();
+  
+  // ─── REDUX STATE MANAGEMENT ───────────────────────────────────────────────
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Redux store se user data access kiya
+  const { user } = useSelector((state) => state.auth);
+
   const handleLogout = () => {
-    logout();
+    dispatch(logout()); // Redux logout action dispatch kiya
     navigate("/login");
   };
 
@@ -80,13 +86,13 @@ const SuperAdminLayout = () => {
           {sidebarOpen && (
             <div className="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl bg-slate-800/50">
               <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center text-xs font-bold shrink-0">
-                SA
+                {user?.name ? user.name.substring(0, 2).toUpperCase() : "SA"}
               </div>
               <div className="overflow-hidden">
                 <p className="text-xs font-semibold text-white truncate">
-                  {user?.name}
+                  {user?.name || "Super Admin"}
                 </p>
-                <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+                <p className="text-xs text-slate-400 truncate">{user?.email || "superadmin@example.com"}</p>
               </div>
             </div>
           )}
